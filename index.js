@@ -41,8 +41,8 @@ function slackAwayIntentHandler() {
 
   if (access_token) {
     setSlackPresence(status, access_token).
-      then(() => { this.emit(':tell', `Okay, I've set your presence to ${status}`); }).
-      catch(error => { this.emit(':tell', error.message); });
+      then(() => { this.emit(':tell', `Okay, I've set you to ${status}`); }).
+      catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your presence. Slack responded with the following error: ${error.message}`); });
   } else {
     this.emit(':tellWithLinkAccountCard', "Please connect your Slack account to Alexa using the Alexa app.");
   }
@@ -59,7 +59,7 @@ function slackStatusIntentHandler() {
   if (access_token) {
     setSlackStatus(status, access_token).
       then(() => { this.emit(':tell', `Okay, I've set your status to: ${status}`); }).
-      catch(error => { this.emit(':tell', error.message); });
+      catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your status. Slack responded with the following error: ${error.message}`); });
   } else {
     this.emit(':tellWithLinkAccountCard', "Please connect your Slack account to Alexa using the Alexa app.");
   }
@@ -106,6 +106,7 @@ function unhandledIntentHandler() {
 /**
  * Sets the Slack user's presence.
  * @param {string} presence The presence, can be away or active.
+ * @param {string} token Slack auth token.
  * @return {Promise} A promise that resolves if the request is successful;
  * or is rejected with an error if it fails.
  */
@@ -126,11 +127,8 @@ function setSlackPresence(presence, token) {
     resolveWithFullResponse: true
   };
   return request(opts).then(response => {
-    if (response.statusCode === 200 && response.body.ok) {
-      return;
-    } else {
-      console.log(response.body);
-      return Promise.reject(new Error("I'm sorry, I couldn't set your presence. Please try again."));
+    if (response.statusCode !== 200 || !response.body.ok) {
+      return Promise.reject(new Error(response.body.error));
     }
   });
 }
@@ -138,6 +136,7 @@ function setSlackPresence(presence, token) {
 /**
  * Sets the Slack user's status.
  * @param {string} status The user's requested status.
+ * @param {string} token Slack auth token.
  * @return {Promise} A promise that resolves if the request is successful;
  * or is rejected with an error if it fails.
  */
@@ -156,15 +155,17 @@ function setSlackStatus(status, token) {
     resolveWithFullResponse: true
   };
   return request(opts).then(response => {
-    if (response.statusCode === 200 && response.body.ok) {
-      return;
-    } else {
-      console.log(response.body);
-      return Promise.reject(new Error("I'm sorry, I couldn't set your status. Please try again."));
+    if (response.statusCode !== 200 || !response.body.ok) {
+      return Promise.reject(new Error(response.body.error));
     }
   });
 }
 
+/**
+ * Returns the profile object the Slack API requires.
+ * @param {string} status The user's requested status.
+ * @return {Object} An object with the text and emoji for the given status.
+ */
 function emojifyStatus(status) {
   if (status === '') {
     profile = {
