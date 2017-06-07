@@ -171,7 +171,7 @@ function emojifyStatus(status) {
       status_text: '',
       status_emoji: ''
     };
-  } if (status.match(/lunch/)) {
+  } else if (status.match(/lunch/)) {
     profile = {
       status_text: 'Out for lunch',
       status_emoji: ':taco:'
