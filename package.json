@@ -1,0 +1,17 @@
+{
+  "name": "alexa-slack",
+  "version": "1.0.0",
+  "description": "Alexa skill to change Slack status",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Guillermo Esteves",
+  "license": "ISC",
+  "repository": "https://github.com/gesteves/alexa-slack",
+  "dependencies": {
+    "alexa-sdk": "^1.0.9",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.4"
+  }
+}
