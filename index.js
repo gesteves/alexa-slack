@@ -32,54 +32,53 @@ function launchRequestHandler() {
 }
 
 /**
- * Handles an `SlackAwayIntent`, which is when the user requests their presence
+ * Handles an `SlackAwayIntent`, sent when the user requests their presence
  * to be set to away or active.
  */
 function slackAwayIntentHandler() {
   let status = this.event.request.intent.slots.awaystatus.value;
   let access_token = this.event.session.user.accessToken;
 
-  if (access_token) {
-    setSlackPresence(status, access_token).
-      then(() => { this.emit(':tell', `Okay, I've set you to ${status}`); }).
-      catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your presence. Slack responded with the following error: ${error.message}`); });
-  } else {
-    this.emit(':tellWithLinkAccountCard', "Please connect your Slack account to Alexa using the Alexa app.");
+  if (!access_token) {
+    this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
+
+  setSlackPresence(status, access_token).
+    then(() => { this.emit(':tell', `Okay, I've set you to ${status}`); }).
+    catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your presence. Slack responded with the following error: ${error.message}`); });
 }
 
 /**
- * Handles an `SlackAwayIntent`, which is when the user requests their status
+ * Handles an `SlackAwayIntent`, sent when the user requests their status
  * set.
  */
 function slackStatusIntentHandler() {
   let status = this.event.request.intent.slots.status.value;
   let access_token = this.event.session.user.accessToken;
 
-  if (access_token) {
-    setSlackStatus(status, access_token).
-      then(() => { this.emit(':tell', `Okay, I've set your status to: ${status}`); }).
-      catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your status. Slack responded with the following error: ${error.message}`); });
-  } else {
-    this.emit(':tellWithLinkAccountCard', "Please connect your Slack account to Alexa using the Alexa app.");
+  if (!access_token) {
+    this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
+
+  setSlackStatus(status, access_token).
+    then(() => { this.emit(':tell', `Okay, I've set your status to: ${status}`); }).
+    catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your status. Slack responded with the following error: ${error.message}`); });
 }
 
 /**
- * Handles an `SlackAwayIntent`, which is when the user requests their status
+ * Handles an `SlackAwayIntent`, sent when the user requests their status
  * be cleared.
  */
 function slackClearStatusIntentHandler() {
-  let intent = this.event.request.intent;
   let access_token = this.event.session.user.accessToken;
 
-  if (access_token) {
-    setSlackStatus('', access_token).
-      then(() => { this.emit(':tell', "Okay, I've cleared your status."); }).
-      catch(error => { this.emit(':tell', error.message); });
-  } else {
-    this.emit(':tellWithLinkAccountCard', "Please connect your Slack account to Alexa using the Alexa app.");
+  if (!access_token) {
+    this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
+
+  setSlackStatus('', access_token).
+    then(() => { this.emit(':tell', "Okay, I've cleared your status."); }).
+    catch(error => { this.emit(':tell', error.message); });
 }
 
 function stopIntentHandler() {
