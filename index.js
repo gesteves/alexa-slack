@@ -166,7 +166,12 @@ function setSlackStatus(status, token) {
 }
 
 function emojifyStatus(status) {
-  if (status.match(/lunch/)) {
+  if (status === '') {
+    profile = {
+      status_text: '',
+      status_emoji: ''
+    };
+  } if (status.match(/lunch/)) {
     profile = {
       status_text: 'Out for lunch',
       status_emoji: ':taco:'
@@ -196,10 +201,10 @@ function emojifyStatus(status) {
       status_text: 'AFK',
       status_emoji: ':no_entry_sign:'
     };
-  } else if (status === '') {
+  } else if (status.match(/call/)) {
     profile = {
-      status_text: '',
-      status_emoji: ''
+      status_text: 'On a call',
+      status_emoji: ':slack_call:'
     };
   } else {
     profile = {
