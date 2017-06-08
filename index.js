@@ -51,7 +51,7 @@ function slackAwayIntentHandler() {
 
   setSlackPresence(status, access_token).
     then(() => { this.emit(':tell', `Okay, I'll set you to ${status}`); }).
-    catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your presence. Slack responded with the following error: ${error.message}`); });
+    catch(error => { this.emit(':tell', error.message); });
 }
 
 /**
@@ -72,7 +72,7 @@ function slackStatusIntentHandler() {
 
   setSlackStatus(status, access_token).
     then(() => { this.emit(':tell', `Okay, I'll set your status to ${status}.`); }).
-    catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your status. Slack responded with the following error: ${error.message}`); });
+    catch(error => { this.emit(':tell', error.message); });
 }
 
 /**
@@ -88,71 +88,47 @@ function slackClearStatusIntentHandler() {
 
   setSlackStatus('', access_token).
     then(() => { this.emit(':tell', "Okay, I'll clear your status."); }).
-    catch(error => { this.emit(':tell', `I'm sorry, I couldn't clear your status. Slack responded with the following error: ${error.message}`); });
+    catch(error => { this.emit(':tell', error.message); });
 }
 
 /**
  * Handles an `SlackSnoozeIntent`, sent when the user sets their DND setting.
- * @todo There's gotta be a better of dealing with timezones. Maybe grab the Echo's
- * address from the Alexa Address API and somehow use it to figure out the timezone.
  */
 function slackSnoozeIntentHandler() {
+  let device_id = this.event.context.System.device.deviceId;
+  let consent_token = this.event.context.System.user.permissions.consentToken;
   let access_token = this.event.session.user.accessToken;
   let minutes;
-  let requested_time;
-  // Apparently there's no way to know the user's timezone,
-  // so I'm hardcoding it in an env variable ¯\_(ツ)_/¯
-  let utc_offset = process.env.USER_TIMEZONE;
-  let now = moment(this.event.request.timestamp).utcOffset(utc_offset);
   let duration;
 
   if (!access_token) {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
 
-  if (this.event.request.intent.slots.duration.value) {
-    duration = moment.duration(this.event.request.intent.slots.duration.value);
-    if (duration.asHours() > 24) {
-      this.emit(':ask', "I'm sorry, I can't snooze your notifications for more than a day. How long would you like to snooze your notifications for?", "I'm sorry, I didn't hear you. Could you say that again?");
+  if (!this.event.request.intent.slots.time.value) {
+    if (this.event.request.intent.slots.duration.value) {
+      duration = moment.duration(this.event.request.intent.slots.duration.value);
+      if (duration.asHours() > 24) {
+        this.emit(':ask', "I'm sorry, I can't snooze your notifications for more than a day. How long would you like to snooze your notifications for?", "I'm sorry, I didn't hear you. Could you say that again?");
+      }
+      minutes = duration.asMinutes();
+    } else {
+      minutes = 60;
     }
-    minutes = duration.asMinutes();
-  } else if (this.event.request.intent.slots.time.value) {
-    requested_time = this.event.request.intent.slots.time.value;
-
-    // Alexa can accept utterances like: "night", "morning", "afternoon", "evening".
-    // Convert them into reasonable hours.
-    switch(requested_time) {
-      case 'MO':
-        requested_time = '09:00';
-        break;
-      case 'AF':
-        requested_time = '13:00';
-        break;
-      case 'EV':
-        requested_time = '19:00';
-        break;
-      case 'NI':
-        requested_time = '21:00';
-        break;
-    }
-
-    requested_time = moment(`${requested_time}Z`, 'HH:mmZ').utcOffset(utc_offset, true);
-
-    // If the requested time is earlier than the current time, add one day.
-    if (now > requested_time) {
-      requested_time.add(1, 'day');
-    }
-
-    // Get the difference in minutes between both times.
-    minutes = requested_time.diff(now, 'minutes');
+    setSlackDND(minutes, access_token).
+      then(() => { this.emit(':tell', `Okay, I'll snooze your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
+      catch(error => { this.emit(':tell', error.message); });
   } else {
-    // If no time or duration given, assume one hour.
-    minutes = 60;
+    getEchoAddress(device_id, consent_token).
+      then(geocodeLocation).
+      then(getUTCOffset).
+      then(offset => {
+        minutes = getTimeDifference(this.event.request.intent.slots.time.value, offset);
+        return setSlackDND(minutes, access_token);
+      }).
+      then(() => { this.emit(':tell', `Okay, I'll snooze your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
+      catch(error => { this.emit(':tell', error.message); });
   }
-
-  setSlackDND(minutes, access_token).
-    then(() => { this.emit(':tell', `Okay, I'll snooze your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
-    catch(error => { this.emit(':tell', `I'm sorry, I couldn't snooze your notifications. Slack responded with the following error: ${error.message}`); });
 }
 
 function stopIntentHandler() {
@@ -179,8 +155,8 @@ function unhandledIntentHandler() {
 
 /**
  * Sets the Slack user's DND.
- * @param {int} minutes The number of minutes to snooze notifications.
- * @param {string} token Slack auth token.
+ * @param {Number} minutes The number of minutes to snooze notifications.
+ * @param {String} token Slack auth token.
  * @return {Promise} A promise that resolves if the request is successful;
  * or is rejected with an error if it fails.
  */
@@ -199,15 +175,15 @@ function setSlackDND(minutes, token) {
   };
   return request(opts).then(response => {
     if (response.statusCode !== 200 || !response.body.ok) {
-      return Promise.reject(new Error(response.body.error));
+      return Promise.reject(new Error(`I couldn't snooze notifications. The error from Slack was: ${response.body.error}`));
     }
   });
 }
 
 /**
  * Sets the Slack user's presence.
- * @param {string} presence The presence, can be away or active.
- * @param {string} token Slack auth token.
+ * @param {String} presence The presence, can be away or active.
+ * @param {String} token Slack auth token.
  * @return {Promise} A promise that resolves if the request is successful;
  * or is rejected with an error if it fails.
  */
@@ -229,15 +205,15 @@ function setSlackPresence(presence, token) {
   };
   return request(opts).then(response => {
     if (response.statusCode !== 200 || !response.body.ok) {
-      return Promise.reject(new Error(response.body.error));
+      return Promise.reject(new Error(`I couldn't set the presence. The error from Slack was: ${response.body.error}`));
     }
   });
 }
 
 /**
  * Sets the Slack user's status.
- * @param {string} status The user's requested status.
- * @param {string} token Slack auth token.
+ * @param {String} status The user's requested status.
+ * @param {String} token Slack auth token.
  * @return {Promise} A promise that resolves if the request is successful;
  * or is rejected with an error if it fails.
  */
@@ -257,14 +233,14 @@ function setSlackStatus(status, token) {
   };
   return request(opts).then(response => {
     if (response.statusCode !== 200 || !response.body.ok) {
-      return Promise.reject(new Error(response.body.error));
+      return Promise.reject(new Error(`I couldn't set the status. The error from Slack was: ${response.body.error}`));
     }
   });
 }
 
 /**
  * Returns the profile object the Slack API requires.
- * @param {string} status The user's requested status.
+ * @param {String} status The user's requested status.
  * @return {Object} An object with the text and emoji for the given status.
  */
 function emojifyStatus(status) {
@@ -330,4 +306,107 @@ function emojifyStatus(status) {
     };
   }
   return profile;
+}
+
+/**
+ * Calculate the difference in minutes between the time sent by the Alexa skill and the curren time.
+ * @param {String} requested_time The time string received from the Alexa skill
+ * @param {Number} offset The user's timezone offset.
+ * @return {Number} The difference in minutes between both times.
+ */
+function getTimeDifference(requested_time, offset) {
+  // Alexa can accept utterances like: "night", "morning", "afternoon", "evening".
+  // Convert them into reasonable hours.
+  switch(requested_time) {
+    case 'MO':
+      requested_time = '09:00';
+      break;
+    case 'AF':
+      requested_time = '13:00';
+      break;
+    case 'EV':
+      requested_time = '19:00';
+      break;
+    case 'NI':
+      requested_time = '21:00';
+      break;
+  }
+
+  requested_time = moment(`${requested_time}Z`, 'HH:mmZ').utcOffset(offset, true);
+  now = moment(Date.now()).utcOffset(offset);
+  if (now > requested_time) {
+    requested_time.add(1, 'day');
+  }
+  return requested_time.diff(now, 'minutes');
+}
+
+
+/**
+ * Requests the Echo's address from the Alexa API.
+ * @param {String} device_id The Echo's device ID.
+ * @param {String} consent_token The user's consent token.
+ * @return {Promise.<String>} A promise that resolves to the address of the Echo,
+ or is rejected if the user hasn't granted permission.
+ */
+function getEchoAddress(device_id, consent_token) {
+  let opts = {
+    url: `https://api.amazonalexa.com/v1/devices/${device_id}/settings/address/countryAndPostalCode`,
+    headers: {
+      'Authorization': `Bearer ${consent_token}`
+    },
+    json: true,
+    simple: false,
+    resolveWithFullResponse: true
+  };
+  return request(opts).then(response => {
+    if (response.statusCode === 200) {
+      return `${response.body.postalCode} ${response.body.countryCode}`;
+    } else {
+      return Promise.reject(new Error("I'm sorry, I couldn't get your location. Make sure you've given this skill permission to use your address in the Alexa app."));
+    }
+  });
+}
+
+/**
+ * Geocodes a location or address using the Google Maps API.
+ * @param {String} location An address or location (e.g. "20003 USA").
+ * @return {Promise.<Object>} A promise that resolves to the first result from the API, or
+ * is rejected if the address is not valid.
+ */
+function geocodeLocation(location) {
+  let opts = {
+    url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${process.env.MAPS_API_KEY}`,
+    json: true,
+    simple: false,
+    resolveWithFullResponse: true
+  };
+  return request(opts).then(response => {
+    if ((response.statusCode === 200) && (response.body.status === 'OK')) {
+      return response.body.results[0];
+    } else {
+      return Promise.reject(new Error(`I'm sorry, I couldn't understand that address. The response from Google Maps was ${response.body.status}`));
+    }
+  });
+}
+
+/**
+ * Gets the timezone for a given location
+ * @param {Object} location A geocoded location returned from the Google Maps geocoding API.
+ * @return {Promise.<Number>} A promise that resolves to the offset from UTC in minutes,
+ * or is rejected if the request fails.
+ */
+function getUTCOffset(location) {
+  let opts = {
+    url: `https://maps.googleapis.com/maps/api/timezone/json?location=${location.geometry.location.lat},${location.geometry.location.lng}&timestamp=${Math.round(Date.now()/1000)}&key=${process.env.MAPS_API_KEY}`,
+    json: true,
+    simple: false,
+    resolveWithFullResponse: true
+  };
+  return request(opts).then(response => {
+    if ((response.statusCode === 200) && (response.body.status === 'OK'))  {
+      return (response.body.rawOffset + response.body.dstOffset)/60;
+    } else {
+      return Promise.reject(new Error(`I'm sorry, I couldn't get the timezone for that location. The response from Google Maps was ${response.body.status}`));
+    }
+  });
 }
