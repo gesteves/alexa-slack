@@ -237,76 +237,6 @@ function setSlackStatus(status, token) {
 }
 
 /**
- * Returns the profile object the Slack API requires.
- * @param {String} status The user's requested status.
- * @return {Object} An object with the text and emoji for the given status.
- */
-function emojifyStatus(status) {
-  if (status === '') {
-    profile = {
-      status_text: '',
-      status_emoji: ''
-    };
-  } else if (status.match(/lunch/)) {
-    profile = {
-      status_text: 'Out for lunch',
-      status_emoji: ':taco:'
-    };
-  } else if (status.match(/coffee/)) {
-    profile = {
-      status_text: 'Out for coffee',
-      status_emoji: ':coffee:'
-    };
-  } else if (status.match(/busy/)) {
-    profile = {
-      status_text: 'Do not disturb',
-      status_emoji: ':no_entry_sign:'
-    };
-  } else if (status.match(/errand/)) {
-    profile = {
-      status_text: 'Running an errand',
-      status_emoji: ':running:'
-    };
-  } else if (status.match(/doctor/)) {
-    profile = {
-      status_text: 'Doctor\'s appointment',
-      status_emoji: ':face_with_thermometer:'
-    };
-  } else if (status.match(/away/)) {
-    profile = {
-      status_text: 'AFK',
-      status_emoji: ':no_entry_sign:'
-    };
-  } else if (status.match(/call/)) {
-    profile = {
-      status_text: 'On a call',
-      status_emoji: ':slack_call:'
-    };
-  } else if (status.match(/meeting/)) {
-    profile = {
-      status_text: 'In a meeting',
-      status_emoji: ':calendar:'
-    };
-  } else if (status.match(/sick/)) {
-    profile = {
-      status_text: 'Out sick',
-      status_emoji: ':face_with_thermometer:'
-    };
-  } else if (status.match(/commuting/)) {
-    profile = {
-      status_text: 'Commuting',
-      status_emoji: ':bus:'
-    };
-  } else {
-    profile = {
-      status_text: status,
-      status_emoji: ':speech_balloon:'
-    };
-  }
-  return profile;
-}
-
-/**
  * Calculate the difference in minutes between the time sent by the Alexa skill and the current time.
  * @param {String} requested_time An ISO 8601 duration received from the Alexa skill
  * @param {Number} offset The user's timezone offset, in minutes.
@@ -423,4 +353,74 @@ function getUTCOffset(location) {
       return Promise.reject(new Error(`I'm sorry, I couldn't get the timezone for that location. The response from Google Maps was ${response.body.status}`));
     }
   });
+}
+
+/**
+ * Returns the profile object the Slack API requires.
+ * @param {String} status The user's requested status.
+ * @return {Object} An object with the text and emoji for the given status.
+ */
+function emojifyStatus(status) {
+  if (status === '') {
+    profile = {
+      status_text: '',
+      status_emoji: ''
+    };
+  } else if (status.match(/lunch/)) {
+    profile = {
+      status_text: 'Out for lunch',
+      status_emoji: ':taco:'
+    };
+  } else if (status.match(/coffee/)) {
+    profile = {
+      status_text: 'Out for coffee',
+      status_emoji: ':coffee:'
+    };
+  } else if (status.match(/busy/)) {
+    profile = {
+      status_text: 'Do not disturb',
+      status_emoji: ':no_entry_sign:'
+    };
+  } else if (status.match(/errand/)) {
+    profile = {
+      status_text: 'Running an errand',
+      status_emoji: ':running:'
+    };
+  } else if (status.match(/doctor/)) {
+    profile = {
+      status_text: 'Doctor\'s appointment',
+      status_emoji: ':face_with_thermometer:'
+    };
+  } else if (status.match(/away/)) {
+    profile = {
+      status_text: 'AFK',
+      status_emoji: ':no_entry_sign:'
+    };
+  } else if (status.match(/call/)) {
+    profile = {
+      status_text: 'On a call',
+      status_emoji: ':slack_call:'
+    };
+  } else if (status.match(/meeting/)) {
+    profile = {
+      status_text: 'In a meeting',
+      status_emoji: ':calendar:'
+    };
+  } else if (status.match(/sick/)) {
+    profile = {
+      status_text: 'Out sick',
+      status_emoji: ':face_with_thermometer:'
+    };
+  } else if (status.match(/commuting/)) {
+    profile = {
+      status_text: 'Commuting',
+      status_emoji: ':bus:'
+    };
+  } else {
+    profile = {
+      status_text: status,
+      status_emoji: ':speech_balloon:'
+    };
+  }
+  return profile;
 }
