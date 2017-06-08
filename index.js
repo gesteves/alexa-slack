@@ -309,7 +309,7 @@ function emojifyStatus(status) {
 }
 
 /**
- * Calculate the difference in minutes between the time sent by the Alexa skill and the curren time.
+ * Calculate the difference in minutes between the time sent by the Alexa skill and the current time.
  * @param {String} requested_time The time string received from the Alexa skill
  * @param {Number} offset The user's timezone offset.
  * @return {Number} The difference in minutes between both times.
@@ -332,11 +332,16 @@ function getTimeDifference(requested_time, offset) {
       break;
   }
 
+  // Convert the requested time and the current time to the user's timezone.
   requested_time = moment(`${requested_time}Z`, 'HH:mmZ').utcOffset(offset, true);
   now = moment(Date.now()).utcOffset(offset);
+
+  // Requested time could be in the past, e.g. saying "9:00 am" at 10:00 am.
+  // In that case add a day.
   if (now > requested_time) {
     requested_time.add(1, 'day');
   }
+
   return requested_time.diff(now, 'minutes');
 }
 
