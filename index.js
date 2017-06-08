@@ -93,13 +93,17 @@ function slackClearStatusIntentHandler() {
 
 /**
  * Handles an `SlackSnoozeIntent`, sent when the user sets their DND setting.
- * @todo There's gotta be a better of dealing with timezones.
+ * @todo There's gotta be a better of dealing with timezones. Maybe grab the Echo's
+ * address from the Alexa Address API and somehow use it to figure out the timezone.
  */
 function slackSnoozeIntentHandler() {
   let access_token = this.event.session.user.accessToken;
   let minutes;
-  let time;
-  let now;
+  let requested_time;
+  // Apparently there's no way to know the user's timezone,
+  // so I'm hardcoding it in an env variable ¯\_(ツ)_/¯
+  let utc_offset = process.env.USER_TIMEZONE;
+  let now = moment(this.event.request.timestamp).utcOffset(utc_offset);
   let duration;
 
   if (!access_token) {
@@ -113,36 +117,34 @@ function slackSnoozeIntentHandler() {
     }
     minutes = duration.asMinutes();
   } else if (this.event.request.intent.slots.time.value) {
-    time = this.event.request.intent.slots.time.value;
+    requested_time = this.event.request.intent.slots.time.value;
 
     // Alexa can accept utterances like: "night", "morning", "afternoon", "evening".
     // Convert them into reasonable hours.
-    switch(time) {
+    switch(requested_time) {
       case 'MO':
-        time = '09:00';
+        requested_time = '09:00';
         break;
       case 'AF':
-        time = '13:00';
+        requested_time = '13:00';
         break;
       case 'EV':
-        time = '19:00';
+        requested_time = '19:00';
         break;
       case 'NI':
-        time = '21:00';
+        requested_time = '21:00';
         break;
     }
-    // Apparently there's no way to know the timezone in the Echo's settings,
-    // so I'm hardcoding it in an env variable ¯\_(ツ)_/¯
-    time = moment(`${time}${process.env.USER_TIMEZONE}`, 'HH:mmZ');
-    now = moment(Date.now()).utcOffset(process.env.USER_TIMEZONE);
+
+    requested_time = moment(`${requested_time}Z`, 'HH:mmZ').utcOffset(utc_offset, true);
 
     // If the requested time is earlier than the current time, add one day.
-    if (now.hour() >= time.hour()) {
-      time.add(1, 'day');
+    if (now > requested_time) {
+      requested_time.add(1, 'day');
     }
 
     // Get the difference in minutes between both times.
-    minutes = time.diff(now, 'minutes');
+    minutes = requested_time.diff(now, 'minutes');
   } else {
     // If no time or duration given, assume one hour.
     minutes = 60;
