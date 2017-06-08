@@ -45,6 +45,10 @@ function slackAwayIntentHandler() {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
 
+  if (!status) {
+    this.emit(':elicitSlot', 'awaystatus', 'Would you like me to set you to away or active?', "I'm sorry, I didn't hear you. Could you say that again?");
+  }
+
   setSlackPresence(status, access_token).
     then(() => { this.emit(':tell', `Okay, I've set you to ${status}`); }).
     catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your presence. Slack responded with the following error: ${error.message}`); });
@@ -60,6 +64,10 @@ function slackStatusIntentHandler() {
 
   if (!access_token) {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
+  }
+
+  if (!status) {
+    this.emit(':elicitSlot', 'status', 'What would you like your status to be?', "I'm sorry, I didn't hear you. Could you say that again?");
   }
 
   setSlackStatus(status, access_token).
