@@ -1,0 +1,232 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "SlackAwayIntent",
+      "samples": [
+        "set me to {awaystatus} ",
+        "mark me as {awaystatus} "
+      ],
+      "slots": [
+        {
+          "name": "awaystatus",
+          "type": "AwayStatus",
+          "samples": [
+            "{awaystatus} "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SlackClearStatusIntent",
+      "samples": [
+        "clear my status",
+        "empty my status"
+      ],
+      "slots": []
+    },
+    {
+      "name": "SlackSnoozeIntent",
+      "samples": [
+        "snooze for {duration} ",
+        "snooze notifications for {duration} ",
+        "turn off notifications for {duration} ",
+        "disable notifications for {duration} ",
+        "disable notifications",
+        "snooze",
+        "snooze notifications",
+        "turn off notifications"
+      ],
+      "slots": [
+        {
+          "name": "duration",
+          "type": "AMAZON.DURATION",
+          "samples": [
+            "{duration} ",
+            "for {duration} "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SlackStatusIntent",
+      "samples": [
+        "set my status to {status} ",
+        "make my status {status} ",
+        "set my status",
+        "change my status"
+      ],
+      "slots": [
+        {
+          "name": "status",
+          "type": "Status",
+          "samples": [
+            "{status} "
+          ]
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "AwayStatus",
+      "values": [
+        {
+          "name": {
+            "value": "away"
+          }
+        },
+        {
+          "name": {
+            "value": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Status",
+      "values": [
+        {
+          "name": {
+            "value": "lunch"
+          }
+        },
+        {
+          "name": {
+            "value": "coffee"
+          }
+        },
+        {
+          "name": {
+            "value": "doctor"
+          }
+        },
+        {
+          "name": {
+            "value": "errand"
+          }
+        },
+        {
+          "name": {
+            "value": "busy"
+          }
+        },
+        {
+          "name": {
+            "value": "away"
+          }
+        },
+        {
+          "name": {
+            "value": "call"
+          }
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "Elicit.Intent-SlackAwayIntent.IntentSlot-awaystatus",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Would you like me to set you as away or active?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-SlackSnoozeIntent.IntentSlot-duration",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "How long would you like to snooze notifications for?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-SlackStatusIntent.IntentSlot-status",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What would you like your status to be?"
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "SlackAwayIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "awaystatus",
+            "type": "AwayStatus",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-SlackAwayIntent.IntentSlot-awaystatus"
+            }
+          }
+        ]
+      },
+      {
+        "name": "SlackClearStatusIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
+      },
+      {
+        "name": "SlackSnoozeIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "duration",
+            "type": "AMAZON.DURATION",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-SlackSnoozeIntent.IntentSlot-duration"
+            }
+          }
+        ]
+      },
+      {
+        "name": "SlackStatusIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "status",
+            "type": "Status",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-SlackStatusIntent.IntentSlot-status"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
