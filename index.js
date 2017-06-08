@@ -306,6 +306,21 @@ function emojifyStatus(status) {
       status_text: 'On a call',
       status_emoji: ':slack_call:'
     };
+  } else if (status.match(/meeting/)) {
+    profile = {
+      status_text: 'In a meeting',
+      status_emoji: ':calendar:'
+    };
+  } else if (status.match(/sick/)) {
+    profile = {
+      status_text: 'Out sick',
+      status_emoji: ':face_with_thermometer:'
+    };
+  } else if (status.match(/commuting/)) {
+    profile = {
+      status_text: 'Commuting',
+      status_emoji: ':bus:'
+    };
   } else {
     profile = {
       status_text: status,
