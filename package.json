@@ -11,6 +11,7 @@
   "repository": "https://github.com/gesteves/alexa-slack",
   "dependencies": {
     "alexa-sdk": "^1.0.9",
+    "moment": "^2.18.1",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.4"
   }
