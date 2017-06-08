@@ -119,11 +119,9 @@ function slackSnoozeIntentHandler() {
       then(() => { this.emit(':tell', `Okay, I'll snooze your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
       catch(error => { this.emit(':tell', error.message); });
   } else {
-    getEchoAddress(device_id, consent_token).
-      then(geocodeLocation).
-      then(getUTCOffset).
+    getEchoUTCOffset(device_id, consent_token).
       then(offset => {
-        minutes = getTimeDifference(this.event.request.intent.slots.time.value, offset);
+        minutes = getMinutesUntil(this.event.request.intent.slots.time.value, offset);
         return setSlackDND(minutes, access_token);
       }).
       then(() => { this.emit(':tell', `Okay, I'll snooze your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
@@ -310,11 +308,11 @@ function emojifyStatus(status) {
 
 /**
  * Calculate the difference in minutes between the time sent by the Alexa skill and the current time.
- * @param {String} requested_time The time string received from the Alexa skill
- * @param {Number} offset The user's timezone offset.
- * @return {Number} The difference in minutes between both times.
+ * @param {String} requested_time An ISO 8601 duration received from the Alexa skill
+ * @param {Number} offset The user's timezone offset, in minutes.
+ * @return {Number} The difference in minutes between the current time and requested_time.
  */
-function getTimeDifference(requested_time, offset) {
+function getMinutesUntil(requested_time, offset) {
   // Alexa can accept utterances like: "night", "morning", "afternoon", "evening".
   // Convert them into reasonable hours.
   switch(requested_time) {
@@ -345,6 +343,17 @@ function getTimeDifference(requested_time, offset) {
   return requested_time.diff(now, 'minutes');
 }
 
+/**
+ * Gets the UTC offset of the Echo, based on its address.
+ * @param {String} device_id The Echo's device ID.
+ * @param {String} consent_token The user's consent token.
+ * @return {Promise.<String>} A promise that resolves to the offset of the Echo.
+ */
+function getEchoUTCOffset(device_id, consent_token) {
+  return getEchoAddress(device_id, consent_token).
+          then(geocodeLocation).
+          then(getUTCOffset);
+}
 
 /**
  * Requests the Echo's address from the Alexa API.
