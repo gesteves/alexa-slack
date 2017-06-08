@@ -50,7 +50,7 @@ function slackAwayIntentHandler() {
   }
 
   setSlackPresence(status, access_token).
-    then(() => { this.emit(':tell', `Okay, I've set you to ${status}`); }).
+    then(() => { this.emit(':tell', `Okay, I'll set you to ${status}`); }).
     catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your presence. Slack responded with the following error: ${error.message}`); });
 }
 
@@ -71,7 +71,7 @@ function slackStatusIntentHandler() {
   }
 
   setSlackStatus(status, access_token).
-    then(() => { this.emit(':tell', `Okay, I've set your status to: ${status}`); }).
+    then(() => { this.emit(':tell', `Okay, I'll set your status to ${status}.`); }).
     catch(error => { this.emit(':tell', `I'm sorry, I couldn't set your status. Slack responded with the following error: ${error.message}`); });
 }
 
@@ -87,7 +87,7 @@ function slackClearStatusIntentHandler() {
   }
 
   setSlackStatus('', access_token).
-    then(() => { this.emit(':tell', "Okay, I've cleared your status."); }).
+    then(() => { this.emit(':tell', "Okay, I'll clear your status."); }).
     catch(error => { this.emit(':tell', `I'm sorry, I couldn't clear your status. Slack responded with the following error: ${error.message}`); });
 }
 
@@ -149,7 +149,7 @@ function slackSnoozeIntentHandler() {
   }
 
   setSlackDND(minutes, access_token).
-    then(() => { this.emit(':tell', `Okay, I've snoozed your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
+    then(() => { this.emit(':tell', `Okay, I'll snooze your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
     catch(error => { this.emit(':tell', `I'm sorry, I couldn't snooze your notifications. Slack responded with the following error: ${error.message}`); });
 }
 
