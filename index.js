@@ -100,6 +100,7 @@ function slackSnoozeIntentHandler() {
   let access_token = this.event.session.user.accessToken;
   let minutes;
   let duration;
+  let requested_time;
 
   if (!access_token) {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
@@ -121,10 +122,11 @@ function slackSnoozeIntentHandler() {
   } else {
     getEchoUTCOffset(device_id, consent_token).
       then(offset => {
-        minutes = getMinutesUntil(this.event.request.intent.slots.time.value, offset);
+        requested_time = normalizeAmazonTime(this.event.request.intent.slots.time.value);
+        minutes = getMinutesUntil(requested_time, offset);
         return setSlackDND(minutes, access_token);
       }).
-      then(() => { this.emit(':tell', `Okay, I'll snooze your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
+      then(() => { this.emit(':tell', `Okay, I'll snooze your notifications until ${moment(requested_time, 'HH:mm').format('h:mm a')}.`); }).
       catch(error => { this.emit(':tell', error.message); });
   }
 }
@@ -237,29 +239,36 @@ function setSlackStatus(status, token) {
 }
 
 /**
+ * Alexa can accept utterances like: "night", "morning", "afternoon", "evening".
+ * This function normalizes them to reasonable hours.
+ * @param {String} amazon_time The time from the AMAZON.TIME slot.
+ * @return {String} A time, in HH:mm format.
+ */
+function normalizeAmazonTime(time) {
+  switch(time) {
+    case 'MO':
+      time = '09:00';
+      break;
+    case 'AF':
+      time = '13:00';
+      break;
+    case 'EV':
+      time = '19:00';
+      break;
+    case 'NI':
+      time = '21:00';
+      break;
+  }
+  return time;
+}
+
+/**
  * Calculate the difference in minutes between the time sent by the Alexa skill and the current time.
  * @param {String} requested_time An ISO 8601 duration received from the Alexa skill
  * @param {Number} offset The user's timezone offset, in minutes.
  * @return {Number} The difference in minutes between the current time and requested_time.
  */
 function getMinutesUntil(requested_time, offset) {
-  // Alexa can accept utterances like: "night", "morning", "afternoon", "evening".
-  // Convert them into reasonable hours.
-  switch(requested_time) {
-    case 'MO':
-      requested_time = '09:00';
-      break;
-    case 'AF':
-      requested_time = '13:00';
-      break;
-    case 'EV':
-      requested_time = '19:00';
-      break;
-    case 'NI':
-      requested_time = '21:00';
-      break;
-  }
-
   // Convert the requested time and the current time to the user's timezone.
   requested_time = moment(`${requested_time}Z`, 'HH:mmZ').utcOffset(offset, true);
   now = moment(Date.now()).utcOffset(offset);
