@@ -98,8 +98,7 @@ function slackAwayIntentHandler() {
 }
 
 /**
- * Handles an `SlackAwayIntent`, sent when the user requests their status
- * set.
+ * Handles an `SlackStatusIntent`, sent when the user requests their status changed.
  */
 function slackStatusIntentHandler() {
   let status = this.event.request.intent.slots.status.value;
@@ -123,7 +122,7 @@ function slackStatusIntentHandler() {
 }
 
 /**
- * Handles an `SlackAwayIntent`, sent when the user requests their status
+ * Handles an `SlackClearStatusIntent`, sent when the user requests their status
  * be cleared.
  */
 function slackClearStatusIntentHandler() {
@@ -313,7 +312,7 @@ function normalizeAmazonTime(time) {
 
 /**
  * Calculate the difference in minutes between the time sent by the Alexa skill and the current time.
- * @param {String} requested_time An ISO 8601 duration received from the Alexa skill
+ * @param {String} requested_time A time received from the Alexa skill (e.g. "13:00")
  * @param {Number} offset The user's timezone offset, in minutes.
  * @return {Number} The difference in minutes between the current time and requested_time.
  */
@@ -323,7 +322,7 @@ function getMinutesUntil(requested_time, offset) {
   now = moment(Date.now()).utcOffset(offset);
 
   // Requested time could be in the past, e.g. saying "9:00 am" at 10:00 am.
-  // In that case add a day.
+  // In that case assume the user meant the next day, so add a day.
   if (now > requested_time) {
     requested_time.add(1, 'day');
   }
@@ -344,7 +343,7 @@ function getEchoUTCOffset(device_id, consent_token) {
 }
 
 /**
- * Requests the Echo's address from the Alexa API.
+ * Requests the Echo's country and postal code from the Alexa API.
  * @param {String} device_id The Echo's device ID.
  * @param {String} consent_token The user's consent token.
  * @return {Promise.<String>} A promise that resolves to the address of the Echo,
