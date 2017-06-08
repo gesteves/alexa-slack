@@ -46,16 +46,21 @@
         "disable notifications",
         "snooze",
         "snooze notifications",
-        "turn off notifications"
+        "turn off notifications",
+        "snooze notifications until {time} ",
+        "disable notifications until {time} ",
+        "turn off notifications until {time} "
       ],
       "slots": [
         {
           "name": "duration",
           "type": "AMAZON.DURATION",
-          "samples": [
-            "{duration} ",
-            "for {duration} "
-          ]
+          "samples": []
+        },
+        {
+          "name": "time",
+          "type": "AMAZON.TIME",
+          "samples": []
         }
       ]
     },
@@ -148,17 +153,6 @@
       ]
     },
     {
-      "id": "Elicit.Intent-SlackSnoozeIntent.IntentSlot-duration",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "How long would you like to snooze notifications for?"
-        }
-      ]
-    },
-    {
       "id": "Elicit.Intent-SlackStatusIntent.IntentSlot-status",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
@@ -203,11 +197,16 @@
           {
             "name": "duration",
             "type": "AMAZON.DURATION",
-            "elicitationRequired": true,
+            "elicitationRequired": false,
             "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-SlackSnoozeIntent.IntentSlot-duration"
-            }
+            "prompts": {}
+          },
+          {
+            "name": "time",
+            "type": "AMAZON.TIME",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
           }
         ]
       },

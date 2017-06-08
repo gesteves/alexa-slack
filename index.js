@@ -93,26 +93,63 @@ function slackClearStatusIntentHandler() {
 
 /**
  * Handles an `SlackSnoozeIntent`, sent when the user sets their DND setting.
+ * @todo There's gotta be a better of dealing with timezones.
  */
 function slackSnoozeIntentHandler() {
   let access_token = this.event.session.user.accessToken;
+  let minutes;
+  let time;
+  let now;
+  let duration;
 
   if (!access_token) {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
 
-  if (!this.event.request.intent.slots.duration.value) {
-    this.emit(':elicitSlot', 'duration', 'How long would you like to snooze your notifications for?', "I'm sorry, I didn't hear you. Could you say that again?");
+  if (this.event.request.intent.slots.duration.value) {
+    duration = moment.duration(this.event.request.intent.slots.duration.value);
+    if (duration.asHours() > 24) {
+      this.emit(':ask', "I'm sorry, I can't snooze your notifications for more than a day. How long would you like to snooze your notifications for?", "I'm sorry, I didn't hear you. Could you say that again?");
+    }
+    minutes = duration.asMinutes();
+  } else if (this.event.request.intent.slots.time.value) {
+    time = this.event.request.intent.slots.time.value;
+
+    // Alexa can accept utterances like: "night", "morning", "afternoon", "evening".
+    // Convert them into reasonable hours.
+    switch(time) {
+      case 'MO':
+        time = '09:00';
+        break;
+      case 'AF':
+        time = '13:00';
+        break;
+      case 'EV':
+        time = '19:00';
+        break;
+      case 'NI':
+        time = '21:00';
+        break;
+    }
+    // Apparently there's no way to know the timezone in the Echo's settings,
+    // so I'm hardcoding it in an env variable ¯\_(ツ)_/¯
+    time = moment(`${time}${process.env.USER_TIMEZONE}`, 'HH:mmZ');
+    now = moment(Date.now()).utcOffset(process.env.USER_TIMEZONE);
+
+    // If the requested time is earlier than the current time, add one day.
+    if (now.hour() >= time.hour()) {
+      time.add(1, 'day');
+    }
+
+    // Get the difference in minutes between both times.
+    minutes = time.diff(now, 'minutes');
+  } else {
+    // If no time or duration given, assume one hour.
+    minutes = 60;
   }
 
-  let duration = moment.duration(this.event.request.intent.slots.duration.value);
-
-  if (duration.asHours() > 24) {
-    this.emit(':elicitSlot', 'duration', "I'm sorry, I can't snooze your notifications for more than a day. How long would you like to snooze your notifications for?", "I'm sorry, I didn't hear you. Could you say that again?");
-  }
-
-  setSlackDND(duration.asMinutes(), access_token).
-    then(() => { this.emit(':tell', `Okay, I've snoozed your notifications for ${duration.humanize()}.`); }).
+  setSlackDND(minutes, access_token).
+    then(() => { this.emit(':tell', `Okay, I've snoozed your notifications for ${moment.duration(minutes, 'minutes').humanize()}.`); }).
     catch(error => { this.emit(':tell', `I'm sorry, I couldn't snooze your notifications. Slack responded with the following error: ${error.message}`); });
 }
 
