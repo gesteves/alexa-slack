@@ -18,6 +18,7 @@ const handlers = {
   'SlackStatusIntent': slackStatusIntentHandler,
   'SlackClearStatusIntent': slackClearStatusIntentHandler,
   'SlackSnoozeIntent': slackSnoozeIntentHandler,
+  'SlackBusyIntent': slackBusyIntentHandler,
   'Unhandled': unhandledIntentHandler,
 };
 
@@ -110,15 +111,13 @@ function slackStatusIntentHandler() {
 
   if (!status) {
     this.emit(':elicitSlot', 'status', `What would you like your status to be? Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
-  }
-
-  if (statuses[status]) {
-    setSlackStatus(statuses[status], access_token).
-      then(() => { this.emit(':tell', `Okay, I'll set your status to ${status}.`); }).
-      catch(error => { this.emit(':tell', error.message); });
-  } else {
+  } else if (!statuses[status]) {
     this.emit(':elicitSlot', 'status', `I'm sorry, that's not a valid status. Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
   }
+
+  setSlackStatus(statuses[status], access_token).
+    then(() => { this.emit(':tell', `Okay, I'll set your status to ${status}.`); }).
+    catch(error => { this.emit(':tell', error.message); });
 }
 
 /**
@@ -150,7 +149,6 @@ function slackSnoozeIntentHandler() {
   let access_token = this.event.session.user.accessToken;
   let minutes;
   let duration;
-  let requested_time;
 
   if (!access_token) {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
@@ -171,14 +169,42 @@ function slackSnoozeIntentHandler() {
       catch(error => { this.emit(':tell', error.message); });
   } else {
     getEchoUTCOffset(device_id, consent_token).
-      then(offset => {
-        requested_time = normalizeAmazonTime(this.event.request.intent.slots.time.value);
-        minutes = getMinutesUntil(requested_time, offset);
-        return setSlackDND(minutes, access_token);
-      }).
+      then(offset => { setSlackDNDUntil(this.event.request.intent.slots.time.value, offset, access_token); }).
       then(() => { this.emit(':tell', `Okay, I'll snooze your notifications until ${moment(requested_time, 'HH:mm').format('h:mm a')}.`); }).
       catch(error => { this.emit(':tell', error.message); });
   }
+}
+
+/**
+ * Handles an `SlackBusyIntent`, which should set a status and snooze notifications
+ * until the specified time.
+ */
+function slackBusyIntentHandler() {
+  let device_id = this.event.context.System.device.deviceId;
+  let consent_token = this.event.context.System.user.permissions.consentToken;
+  let access_token = this.event.session.user.accessToken;
+  let status = this.event.request.intent.slots.status.value;
+  let requested_time = this.event.request.intent.slots.time.value;
+
+  if (!access_token) {
+    this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
+  }
+
+  if (!status) {
+    this.emit(':elicitSlot', 'status', `What would you like your status to be? Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
+  } else if (!statuses[status]) {
+    this.emit(':elicitSlot', 'status', `I'm sorry, that's not a valid status. Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
+  }
+
+  if (!requested_time) {
+    this.emit(':elicitSlot', 'time', "Until what time do you want to snooze your notifications?", "I'm sorry, I didn't hear you. Could you say that again?");
+  }
+
+  getEchoUTCOffset(device_id, consent_token).
+    then(offset => { setSlackDNDUntil(requested_time, offset, access_token); }).
+    then(setSlackStatus(statuses[status], access_token)).
+    then(() => { this.emit(':tell', `Okay, I'll change your status and snooze your notifications until ${moment(requested_time, 'HH:mm').format('h:mm a')}.`); }).
+    catch(error => { this.emit(':tell', error.message); });
 }
 
 function stopIntentHandler() {
@@ -228,6 +254,20 @@ function setSlackDND(minutes, token) {
       return Promise.reject(new Error(`I couldn't snooze notifications. The error from Slack was: ${response.body.error}`));
     }
   });
+}
+
+/**
+ * Sets the Slack user's DND until a given time.
+ * @param {String} time The time snooze should end, e.g. 13:00 or EV
+ * @param {Number} offset An UTC offset in minutes.
+ * @param {String} token Slack auth token.
+ * @return {Promise} A promise that resolves if the request is successful;
+ * or is rejected with an error if it fails.
+ */
+function setSlackDNDUntil(time, offset, token) {
+  let requested_time = normalizeAmazonTime(time);
+  let minutes = getMinutesUntil(requested_time, offset);
+  return setSlackDND(minutes, token);
 }
 
 /**

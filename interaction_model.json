@@ -29,6 +29,30 @@
       ]
     },
     {
+      "name": "SlackBusyIntent",
+      "samples": [
+        "I'm in a {status} until {time} ",
+        "I'm on a {status} until {time} ",
+        "I'm {status} until {time} "
+      ],
+      "slots": [
+        {
+          "name": "status",
+          "type": "Status",
+          "samples": [
+            "{status}"
+          ]
+        },
+        {
+          "name": "time",
+          "type": "AMAZON.TIME",
+          "samples": [
+            "{time} "
+          ]
+        }
+      ]
+    },
+    {
       "name": "SlackClearStatusIntent",
       "samples": [
         "clear my status",
@@ -168,6 +192,28 @@
       ]
     },
     {
+      "id": "Elicit.Intent-SlackBusyIntent.IntentSlot-status",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "What would you like your status to be?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-SlackBusyIntent.IntentSlot-time",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Until what time do you want to snooze your notifications?"
+        }
+      ]
+    },
+    {
       "id": "Elicit.Intent-SlackStatusIntent.IntentSlot-status",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
@@ -194,6 +240,31 @@
             "confirmationRequired": false,
             "prompts": {
               "elicit": "Elicit.Intent-SlackAwayIntent.IntentSlot-awaystatus"
+            }
+          }
+        ]
+      },
+      {
+        "name": "SlackBusyIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "status",
+            "type": "Status",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-SlackBusyIntent.IntentSlot-status"
+            }
+          },
+          {
+            "name": "time",
+            "type": "AMAZON.TIME",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-SlackBusyIntent.IntentSlot-time"
             }
           }
         ]
