@@ -13,22 +13,6 @@
       "samples": []
     },
     {
-      "name": "SlackAwayIntent",
-      "samples": [
-        "set me to {awaystatus} ",
-        "mark me as {awaystatus} "
-      ],
-      "slots": [
-        {
-          "name": "awaystatus",
-          "type": "AwayStatus",
-          "samples": [
-            "{awaystatus} "
-          ]
-        }
-      ]
-    },
-    {
       "name": "SlackBusyIntent",
       "samples": [
         "I'm in a {status} until {time} ",
@@ -181,17 +165,6 @@
   ],
   "prompts": [
     {
-      "id": "Elicit.Intent-SlackAwayIntent.IntentSlot-awaystatus",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "Would you like me to set you as away or active?"
-        }
-      ]
-    },
-    {
       "id": "Elicit.Intent-SlackBusyIntent.IntentSlot-status",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
@@ -228,22 +201,6 @@
   "dialog": {
     "version": "1.0",
     "intents": [
-      {
-        "name": "SlackAwayIntent",
-        "confirmationRequired": false,
-        "prompts": {},
-        "slots": [
-          {
-            "name": "awaystatus",
-            "type": "AwayStatus",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-SlackAwayIntent.IntentSlot-awaystatus"
-            }
-          }
-        ]
-      },
       {
         "name": "SlackBusyIntent",
         "confirmationRequired": false,

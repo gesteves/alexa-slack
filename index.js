@@ -14,7 +14,6 @@ const handlers = {
   'AMAZON.StopIntent': stopIntentHandler,
   'AMAZON.CancelIntent': cancelIntentHandler,
   'AMAZON.HelpIntent': helpIntentHandler,
-  'SlackAwayIntent': slackAwayIntentHandler,
   'SlackStatusIntent': slackStatusIntentHandler,
   'SlackClearStatusIntent': slackClearStatusIntentHandler,
   'SlackSnoozeIntent': slackSnoozeIntentHandler,
@@ -75,27 +74,6 @@ function launchRequestHandler() {
   } else {
     this.emit(':tellWithLinkAccountCard', "Please connect your Slack account to Alexa using the Alexa app.");
   }
-}
-
-/**
- * Handles an `SlackAwayIntent`, sent when the user requests their presence
- * to be set to away or active.
- */
-function slackAwayIntentHandler() {
-  let status = this.event.request.intent.slots.awaystatus.value;
-  let access_token = this.event.session.user.accessToken;
-
-  if (!access_token) {
-    this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
-  }
-
-  if (!status) {
-    this.emit(':elicitSlot', 'awaystatus', 'Would you like me to set you to away or active?', "I'm sorry, I didn't hear you. Could you say that again?");
-  }
-
-  setSlackPresence(status, access_token).
-    then(() => { this.emit(':tell', `Okay, I'll set you to ${status}`); }).
-    catch(error => { this.emit(':tell', error.message); });
 }
 
 /**
@@ -268,36 +246,6 @@ function setSlackDNDUntil(time, offset, token) {
   let requested_time = normalizeAmazonTime(time);
   let minutes = getMinutesUntil(requested_time, offset);
   return setSlackDND(minutes, token);
-}
-
-/**
- * Sets the Slack user's presence.
- * @param {String} presence The presence, can be away or active.
- * @param {String} token Slack auth token.
- * @return {Promise} A promise that resolves if the request is successful;
- * or is rejected with an error if it fails.
- */
-function setSlackPresence(presence, token) {
-  if (presence === 'active') {
-    presence = 'auto';
-  }
-
-  let opts = {
-    method: 'POST',
-    url: `https://slack.com/api/users.setPresence`,
-    form: {
-      presence: presence,
-      token: token
-    },
-    json: true,
-    simple: false,
-    resolveWithFullResponse: true
-  };
-  return request(opts).then(response => {
-    if (response.statusCode !== 200 || !response.body.ok) {
-      return Promise.reject(new Error(`I couldn't set the presence. The error from Slack was: ${response.body.error}`));
-    }
-  });
 }
 
 /**
