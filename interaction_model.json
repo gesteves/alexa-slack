@@ -23,16 +23,12 @@
         {
           "name": "status",
           "type": "Status",
-          "samples": [
-            "{status}"
-          ]
+          "samples": []
         },
         {
           "name": "time",
           "type": "AMAZON.TIME",
-          "samples": [
-            "{time} "
-          ]
+          "samples": []
         }
       ]
     },
@@ -84,29 +80,12 @@
         {
           "name": "status",
           "type": "Status",
-          "samples": [
-            "{status} "
-          ]
+          "samples": []
         }
       ]
     }
   ],
   "types": [
-    {
-      "name": "AwayStatus",
-      "values": [
-        {
-          "name": {
-            "value": "away"
-          }
-        },
-        {
-          "name": {
-            "value": "active"
-          }
-        }
-      ]
-    },
     {
       "name": "Status",
       "values": [
@@ -162,113 +141,5 @@
         }
       ]
     }
-  ],
-  "prompts": [
-    {
-      "id": "Elicit.Intent-SlackBusyIntent.IntentSlot-status",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "What would you like your status to be?"
-        }
-      ]
-    },
-    {
-      "id": "Elicit.Intent-SlackBusyIntent.IntentSlot-time",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "Until what time do you want to snooze your notifications?"
-        }
-      ]
-    },
-    {
-      "id": "Elicit.Intent-SlackStatusIntent.IntentSlot-status",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "What would you like your status to be?"
-        }
-      ]
-    }
-  ],
-  "dialog": {
-    "version": "1.0",
-    "intents": [
-      {
-        "name": "SlackBusyIntent",
-        "confirmationRequired": false,
-        "prompts": {},
-        "slots": [
-          {
-            "name": "status",
-            "type": "Status",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-SlackBusyIntent.IntentSlot-status"
-            }
-          },
-          {
-            "name": "time",
-            "type": "AMAZON.TIME",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-SlackBusyIntent.IntentSlot-time"
-            }
-          }
-        ]
-      },
-      {
-        "name": "SlackClearStatusIntent",
-        "confirmationRequired": false,
-        "prompts": {},
-        "slots": []
-      },
-      {
-        "name": "SlackSnoozeIntent",
-        "confirmationRequired": false,
-        "prompts": {},
-        "slots": [
-          {
-            "name": "duration",
-            "type": "AMAZON.DURATION",
-            "elicitationRequired": false,
-            "confirmationRequired": false,
-            "prompts": {}
-          },
-          {
-            "name": "time",
-            "type": "AMAZON.TIME",
-            "elicitationRequired": false,
-            "confirmationRequired": false,
-            "prompts": {}
-          }
-        ]
-      },
-      {
-        "name": "SlackStatusIntent",
-        "confirmationRequired": false,
-        "prompts": {},
-        "slots": [
-          {
-            "name": "status",
-            "type": "Status",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-SlackStatusIntent.IntentSlot-status"
-            }
-          }
-        ]
-      }
-    ]
-  }
+  ]
 }

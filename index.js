@@ -87,12 +87,6 @@ function slackStatusIntentHandler() {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
 
-  if (!status) {
-    this.emit(':elicitSlot', 'status', `What would you like your status to be? Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
-  } else if (!statuses[status]) {
-    this.emit(':elicitSlot', 'status', `I'm sorry, that's not a valid status. Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
-  }
-
   setSlackStatus(statuses[status], access_token).
     then(() => { this.emit(':tell', `Okay, I'll set your status to ${status}.`); }).
     catch(error => { this.emit(':tell', error.message); });
@@ -166,16 +160,6 @@ function slackBusyIntentHandler() {
 
   if (!access_token) {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
-  }
-
-  if (!status) {
-    this.emit(':elicitSlot', 'status', `What would you like your status to be? Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
-  } else if (!statuses[status]) {
-    this.emit(':elicitSlot', 'status', `I'm sorry, that's not a valid status. Your options are: ${Object.keys(statuses).join(', ')}`, "I'm sorry, I didn't hear you. Could you say that again?");
-  }
-
-  if (!requested_time) {
-    this.emit(':elicitSlot', 'time', "Until what time do you want to snooze your notifications?", "I'm sorry, I didn't hear you. Could you say that again?");
   }
 
   getEchoUTCOffset(device_id, consent_token).
