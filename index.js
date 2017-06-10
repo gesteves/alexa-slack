@@ -107,6 +107,12 @@ function slackClearStatusIntentHandler() {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
 
+  if (!status) {
+    this.emit(':ask', "I didn't get your status, please try again.", "I'm sorry, I didn't hear you. Could you say that again?");
+  } else if (!statuses[status]) {
+    this.emit(':ask', `I'm sorry, that's not a valid status. Your options are: ${Object.keys(statuses).join(', ')}. Please try again.`, "I'm sorry, I didn't hear you. Could you say that again?");
+  }
+
   setSlackStatus(status, access_token).
     then(() => { this.emit(':tell', "Okay, I'll clear your status."); }).
     catch(error => { this.emit(':tell', error.message); });
@@ -160,6 +166,16 @@ function slackBusyIntentHandler() {
 
   if (!access_token) {
     this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
+  }
+
+  if (!status) {
+    this.emit(':ask', "I didn't get your status, please try again.", "I'm sorry, I didn't hear you. Could you say that again?");
+  } else if (!statuses[status]) {
+    this.emit(':ask', `I'm sorry, that's not a valid status. Your options are: ${Object.keys(statuses).join(', ')}. Please try again.`, "I'm sorry, I didn't hear you. Could you say that again?");
+  }
+
+  if (!requested_time) {
+    this.emit(':ask', "I didn't get the time, please try again.", "I'm sorry, I didn't hear you. Could you say that again?");
   }
 
   getEchoUTCOffset(device_id, consent_token).
