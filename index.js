@@ -180,7 +180,7 @@ function slackBusyIntentHandler() {
 
   getEchoUTCOffset(device_id, consent_token).
     then(offset => { return setSlackDNDUntil(requested_time, offset, access_token); }).
-    then(setSlackStatus(statuses[status], access_token)).
+    then(() => { return setSlackStatus(statuses[status], access_token) }).
     then(() => { this.emit(':tell', `Okay, I'll change your status and snooze your notifications until ${moment(requested_time, 'HH:mm').format('h:mm a')}.`); }).
     catch(error => { this.emit(':tell', error.message); });
 }
