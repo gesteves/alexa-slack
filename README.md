@@ -14,13 +14,13 @@ Alexa skill to set presence and status in Slack, built in Node and hosted on AWS
 
 ## Installation
 
-I can't release this on the Alexa Skills store because I don't have the right to use "Slack" as the invocation name for a public skill, but feel free to fork this repo and set it up as your own skill in development mode for private use. It'll take a bit of work but basically you'll need to:
+I can't release this on the Alexa Skills store because I don't have the right to use "Slack" as the invocation name for a public skill, but feel free to fork this repo and set it up as your own skill in development mode for private use. It'll take a bit of work, but you'll have to:
 
 * Set up a new [Slack app](https://api.slack.com/apps), with the `dnd:write`, `users.profile:write`, and `users:write` permission scopes.
-* Set up an [Alexa Skills Kit skill](https://developer.amazon.com/edw/home.html#/skills). Use the code in `interaction_model.json` for the skill's interaction_model.
+* Set up an [Alexa Skills Kit skill](https://developer.amazon.com/edw/home.html#/skills). Use the code in `interaction_model.json` for the skill's interaction model.
 * Set up a project in the [Google Developer Console](https://console.developers.google.com). Enable the Google Maps Geocoding API and the Google Maps Time Zone API, and get an API key.
 * In the configuration tab, set up [account linking](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/linking-an-alexa-user-with-a-user-in-your-system) using your Slack app's OAuth information. (Pro tip: the "Client Authentication Scheme" option should be "Credentials in request body").
 * Also in the configuration tab, check the option to request permission to use "Device Address", specifically the device's postal code & country. This is used to determine the user's time zone when they say a time.
 * Set up an [AWS Lambda function](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/developing-an-alexa-skill-as-a-lambda-function) for your Alexa skill. You'll need to set up an `ALEXA_APP_ID` environment variable with your skill's ID; and a `MAPS_API_KEY` env variable with the Google Maps API key you got earlier. (This is how we determine the user's time zone: get the postal code of the Echo, geocode it to a lat/long pair, then get the timezone offset of those coordinates. I wish Amazon made this easier.)
 * Clone/fork this repo, run `npm install`, then zip up `index.js`, `package.json`, and the `node_modules` folder, and upload to your Lambda function.
-* Enable your skill for testing, then enable it in your Alexa app in your phone. It should prompt you to sign in with Slack to link your account. Make sure your Echo has a street address set up, and give the skill permission to access it (it's how the skill determines your time zone when you say a time).
+* Enable your skill for testing, then enable it in your Alexa app in your phone. Make sure your Echo has an address set up, and give the skill permission to access it. It should prompt you to sign in with Slack to link your account. Make sure your Echo has a address set up, and give the skill permission to access it. If it successfully links your account, you're set.
