@@ -18,7 +18,8 @@
         "I'm in a {status} until {time} ",
         "I'm on a {status} until {time} ",
         "I'm {status} until {time} ",
-        "I'm at {status} until {time} "
+        "I'm at {status} until {time} ",
+        "I'm out for {status} until {time} "
       ],
       "slots": [
         {
