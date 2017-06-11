@@ -24,6 +24,11 @@ const statuses = {
     status_text: 'Out for lunch',
     status_emoji: ':taco:'
   },
+  launch: {
+    // Fuck my accent.
+    status_text: 'Out for lunch',
+    status_emoji: ':taco:'
+  },
   coffee: {
     status_text: 'Out for coffee',
     status_emoji: ':coffee:'
