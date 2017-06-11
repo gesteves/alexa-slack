@@ -81,6 +81,8 @@ function statusIntentHandler() {
     this.emit(':ask', "I didn't get the time, please try again.", "I'm sorry, I didn't hear you. Could you say that again?");
   }
 
+  requested_time = normalizeAmazonTime(requested_time);
+
   getEchoUTCOffset(device_id, consent_token).
     then(offset => { return snoozeSlackUntil(requested_time, offset, access_token); }).
     then(() => { return setSlackStatus(emojifyStatus(status), access_token); }).
@@ -116,8 +118,7 @@ function unhandledIntentHandler() {
  * or is rejected with an error if it fails.
  */
 function snoozeSlackUntil(time, offset, token) {
-  let requested_time = normalizeAmazonTime(time);
-  let minutes = getMinutesUntil(requested_time, offset);
+  let minutes = getMinutesUntil(time, offset);
   return setSlackSnooze(minutes, token);
 }
 
