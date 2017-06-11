@@ -14,8 +14,8 @@ const handlers = {
   'AMAZON.StopIntent': stopIntentHandler,
   'AMAZON.CancelIntent': cancelIntentHandler,
   'AMAZON.HelpIntent': helpIntentHandler,
-  'SlackClearStatusIntent': slackClearStatusIntentHandler,
-  'SlackBusyIntent': slackBusyIntentHandler,
+  'SlackClearStatusIntent': clearStatusIntentHandler,
+  'SlackStatusIntent': statusIntentHandler,
   'Unhandled': unhandledIntentHandler,
 };
 
@@ -76,10 +76,10 @@ function launchRequestHandler() {
 
 
 /**
- * Handles an `SlackClearStatusIntent`, sent when the user requests their status
- * be cleared.
+ * Handles an `SlackClearStatusIntent`, which should clear the user's status
+ * and snooze setting.
  */
-function slackClearStatusIntentHandler() {
+function clearStatusIntentHandler() {
   let access_token = this.event.session.user.accessToken;
   let status = {
     status_text: '',
@@ -102,10 +102,10 @@ function slackClearStatusIntentHandler() {
 }
 
 /**
- * Handles an `SlackBusyIntent`, which should set a status and snooze notifications
+ * Handles an `SlackStatusIntent`, which should set a status and snooze notifications
  * until the specified time.
  */
-function slackBusyIntentHandler() {
+function statusIntentHandler() {
   let device_id = this.event.context.System.device.deviceId;
   let consent_token = this.event.context.System.user.permissions.consentToken;
   let access_token = this.event.session.user.accessToken;

@@ -13,7 +13,7 @@
       "samples": []
     },
     {
-      "name": "SlackBusyIntent",
+      "name": "SlackStatusIntent",
       "samples": [
         "I'm in a {status} until {time} ",
         "I'm on a {status} until {time} ",
