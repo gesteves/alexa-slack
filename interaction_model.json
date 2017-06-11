@@ -15,7 +15,11 @@
     {
       "name": "SlackBusyIntent",
       "samples": [
-        "I'm {status} until {time} "
+        "I'm in a {status} until {time} ",
+        "I'm on a {status} until {time} ",
+        "I'm {status} until {time} ",
+        "I'm at {status} until {time} ",
+        "I'm out for {status} until {time} "
       ],
       "slots": [
         {
@@ -45,22 +49,22 @@
       "values": [
         {
           "name": {
-            "value": "out for lunch"
+            "value": "lunch"
           }
         },
         {
           "name": {
-            "value": "out for coffee"
+            "value": "coffee"
           }
         },
         {
           "name": {
-            "value": "doctor's appointment"
+            "value": "doctor"
           }
         },
         {
           "name": {
-            "value": "running an errand"
+            "value": "errand"
           }
         },
         {
@@ -75,57 +79,22 @@
         },
         {
           "name": {
-            "value": "in a call"
+            "value": "call"
           }
         },
         {
           "name": {
-            "value": "in a meeting"
+            "value": "sick"
           }
         },
         {
           "name": {
-            "value": "out sick"
-          }
-        },
-        {
-          "name": {
-            "value": "on vacation"
+            "value": "meeting"
           }
         },
         {
           "name": {
             "value": "commuting"
-          }
-        },
-        {
-          "name": {
-            "value": "on a call"
-          }
-        },
-        {
-          "name": {
-            "value": "running errands"
-          }
-        },
-        {
-          "name": {
-            "value": "commuting in"
-          }
-        },
-        {
-          "name": {
-            "value": "commuting home"
-          }
-        },
-        {
-          "name": {
-            "value": "away from keyboard"
-          }
-        },
-        {
-          "name": {
-            "value": "at the doctor"
           }
         }
       ]
