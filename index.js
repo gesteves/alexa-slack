@@ -143,7 +143,8 @@ function setSlackSnooze(minutes, token) {
   };
   return request(opts).then(response => {
     if (response.statusCode !== 200 || !response.body.ok) {
-      return Promise.reject(new Error(`I couldn't snooze notifications. The error from Slack was: ${response.body.error}`));
+      console.error(`Error setting Slack snooze: ${response.body}`);
+      return Promise.reject(new Error("I couldn't snooze your Slack notifications."));
     }
   });
 }
@@ -169,7 +170,8 @@ function checkSlackSnooze(token) {
     if (response.statusCode === 200 && response.body.ok) {
       return response.body.snooze_enabled;
     } else {
-      return Promise.reject(new Error(`I couldn't check snooze status. The error from Slack was: ${response.body.error}`));
+      console.error(`Error checking Slack snooze status: ${response.body}`);
+      return Promise.reject(new Error("I couldn't check your Slack snooze."));
     }
   });
 }
@@ -193,7 +195,8 @@ function endSlackSnooze(token) {
   };
   return request(opts).then(response => {
     if (response.statusCode !== 200 || !response.body.ok) {
-      return Promise.reject(new Error(`I couldn't end snooze. The error from Slack was: ${response.body.error}`));
+      console.error(`Error ending Slack snooze: ${response.body}`);
+      return Promise.reject(new Error("I couldn't end your Slack snooze."));
     }
   });
 }
@@ -219,7 +222,8 @@ function setSlackStatus(status, token) {
   };
   return request(opts).then(response => {
     if (response.statusCode !== 200 || !response.body.ok) {
-      return Promise.reject(new Error(`I couldn't set the status. The error from Slack was: ${response.body.error}`));
+      console.error(`Error setting Slack status: ${response.body}`);
+      return Promise.reject(new Error("I couldn't set your Slack status."));
     }
   });
 }
@@ -301,6 +305,7 @@ function getEchoAddress(device_id, consent_token) {
     if (response.statusCode === 200) {
       return `${response.body.postalCode} ${response.body.countryCode}`;
     } else {
+      console.error(`Error getting Echo address: ${response.statusCode} ${response.body}`);
       return Promise.reject(new Error("I'm sorry, I couldn't get your location. Make sure you've given this skill permission to use your address in the Alexa app."));
     }
   });
@@ -323,7 +328,8 @@ function geocodeLocation(location) {
     if ((response.statusCode === 200) && (response.body.status === 'OK')) {
       return response.body.results[0];
     } else {
-      return Promise.reject(new Error(`I'm sorry, I couldn't understand that address. The response from Google Maps was ${response.body.status}`));
+      console.error(`Error geocoding location: ${response.body.status}`);
+      return Promise.reject(new Error("I'm sorry, I couldn't understand that address."));
     }
   });
 }
@@ -345,7 +351,8 @@ function getUTCOffset(location) {
     if ((response.statusCode === 200) && (response.body.status === 'OK'))  {
       return (response.body.rawOffset + response.body.dstOffset)/60;
     } else {
-      return Promise.reject(new Error(`I'm sorry, I couldn't get the timezone for that location. The response from Google Maps was ${response.body.status}`));
+      console.error(`Error determining UTC offset: ${response.body.status}`);
+      return Promise.reject(new Error("I'm sorry, I couldn't get the timezone for that location."));
     }
   });
 }
