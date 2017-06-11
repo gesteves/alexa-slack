@@ -41,50 +41,6 @@
         "empty my status"
       ],
       "slots": []
-    },
-    {
-      "name": "SlackSnoozeIntent",
-      "samples": [
-        "snooze for {duration} ",
-        "snooze notifications for {duration} ",
-        "turn off notifications for {duration} ",
-        "disable notifications for {duration} ",
-        "disable notifications",
-        "snooze",
-        "snooze notifications",
-        "turn off notifications",
-        "snooze notifications until {time} ",
-        "disable notifications until {time} ",
-        "turn off notifications until {time} "
-      ],
-      "slots": [
-        {
-          "name": "duration",
-          "type": "AMAZON.DURATION",
-          "samples": []
-        },
-        {
-          "name": "time",
-          "type": "AMAZON.TIME",
-          "samples": []
-        }
-      ]
-    },
-    {
-      "name": "SlackStatusIntent",
-      "samples": [
-        "set my status to {status} ",
-        "make my status {status} ",
-        "set my status",
-        "change my status"
-      ],
-      "slots": [
-        {
-          "name": "status",
-          "type": "Status",
-          "samples": []
-        }
-      ]
     }
   ],
   "types": [
