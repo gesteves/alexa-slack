@@ -179,7 +179,6 @@ function snoozeSlackUntil(time, offset, token) {
  * or is rejected with an error if it fails.
  */
 function setSlackSnooze(minutes, token) {
-
   let opts = {
     method: 'POST',
     url: `https://slack.com/api/dnd.setSnooze`,
@@ -205,7 +204,6 @@ function setSlackSnooze(minutes, token) {
  * or is rejected with an error if it fails.
  */
 function checkSlackSnooze(token) {
-
   let opts = {
     method: 'POST',
     url: `https://slack.com/api/dnd.info`,
@@ -232,7 +230,6 @@ function checkSlackSnooze(token) {
  * or is rejected with an error if it fails.
  */
 function endSlackSnooze(token) {
-
   let opts = {
     method: 'POST',
     url: `https://slack.com/api/dnd.endSnooze`,
