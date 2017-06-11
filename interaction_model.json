@@ -48,12 +48,17 @@
       "values": [
         {
           "name": {
+            "value": "lunch"
+          }
+        },
+        {
+          "name": {
             "value": "out for lunch"
           }
         },
         {
           "name": {
-            "value": "at lunch"
+            "value": "out to lunch"
           }
         },
         {
@@ -63,12 +68,22 @@
         },
         {
           "name": {
-            "value": "having lunch"
+            "value": "grabbing lunch"
           }
         },
         {
           "name": {
-            "value": "lunch"
+            "value": "eating lunch"
+          }
+        },
+        {
+          "name": {
+            "value": "coffee"
+          }
+        },
+        {
+          "name": {
+            "value": "getting coffee"
           }
         },
         {
@@ -78,7 +93,7 @@
         },
         {
           "name": {
-            "value": "getting coffee"
+            "value": "grabbing coffee"
           }
         },
         {
@@ -93,7 +108,22 @@
         },
         {
           "name": {
+            "value": "DND"
+          }
+        },
+        {
+          "name": {
+            "value": "do not disturb"
+          }
+        },
+        {
+          "name": {
             "value": "head down"
+          }
+        },
+        {
+          "name": {
+            "value": "errand"
           }
         },
         {
@@ -108,6 +138,11 @@
         },
         {
           "name": {
+            "value": "doctor"
+          }
+        },
+        {
+          "name": {
             "value": "at the doctor"
           }
         },
@@ -118,12 +153,7 @@
         },
         {
           "name": {
-            "value": "sick"
-          }
-        },
-        {
-          "name": {
-            "value": "out sick"
+            "value": "doctor's appointment"
           }
         },
         {
@@ -138,17 +168,7 @@
         },
         {
           "name": {
-            "value": "a.f.k."
-          }
-        },
-        {
-          "name": {
-            "value": "on a call"
-          }
-        },
-        {
-          "name": {
-            "value": "in a call"
+            "value": "AFK"
           }
         },
         {
@@ -158,12 +178,12 @@
         },
         {
           "name": {
-            "value": "coffee"
+            "value": "in a call"
           }
         },
         {
           "name": {
-            "value": "doctor"
+            "value": "on a call"
           }
         },
         {
@@ -178,6 +198,21 @@
         },
         {
           "name": {
+            "value": "sick"
+          }
+        },
+        {
+          "name": {
+            "value": "out sick"
+          }
+        },
+        {
+          "name": {
+            "value": "sick leave"
+          }
+        },
+        {
+          "name": {
             "value": "commuting"
           }
         },
@@ -188,12 +223,7 @@
         },
         {
           "name": {
-            "value": "out of office"
-          }
-        },
-        {
-          "name": {
-            "value": "o.o.o."
+            "value": "vacation"
           }
         },
         {
@@ -203,12 +233,7 @@
         },
         {
           "name": {
-            "value": "vacation"
-          }
-        },
-        {
-          "name": {
-            "value": "p.t.o."
+            "value": "out on vacation"
           }
         }
       ]

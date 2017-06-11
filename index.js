@@ -365,7 +365,7 @@ function emojifyStatus(status) {
       status_text: 'Out for coffee',
       status_emoji: ':coffee:'
     };
-  } else if (status.match(/busy|unavailable|head down/)) {
+  } else if (status.match(/busy|unavailable|head down|DND|do not disturb/)) {
     profile = {
       status_text: 'Do not disturb',
       status_emoji: ':no_entry_sign:'
@@ -380,7 +380,7 @@ function emojifyStatus(status) {
       status_text: 'Doctor\'s appointment',
       status_emoji: ':face_with_thermometer:'
     };
-  } else if (status.match(/away/)) {
+  } else if (status.match(/away|AFK/)) {
     profile = {
       status_text: 'AFK',
       status_emoji: ':zzz:'
