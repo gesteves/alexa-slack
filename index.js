@@ -27,7 +27,7 @@ function launchRequestHandler() {
   if (access_token) {
     this.emit(':ask', 'What would you like to do?', "I'm sorry, I didn't hear you. Could you say that again?");
   } else {
-    this.emit(':tellWithLinkAccountCard', "Please connect your Slack account to Alexa using the Alexa app.");
+    this.emit(':tellWithLinkAccountCard', 'Please connect your Slack account to Alexa using the Alexa app on your phone.');
   }
 }
 
