@@ -13,13 +13,20 @@
       "samples": []
     },
     {
+      "name": "SlackClearStatusIntent",
+      "samples": [
+        "clear my status",
+        "empty my status"
+      ],
+      "slots": []
+    },
+    {
       "name": "SlackStatusIntent",
       "samples": [
-        "I'm in a {status} until {time} ",
-        "I'm on a {status} until {time} ",
         "I'm {status} until {time} ",
-        "I'm at {status} until {time} ",
-        "I'm out for {status} until {time} "
+        "I am {status} until {time} ",
+        "Set my status to {status} until {time} ",
+        "Change my status to {status} until {time} "
       ],
       "slots": [
         {
@@ -33,14 +40,6 @@
           "samples": []
         }
       ]
-    },
-    {
-      "name": "SlackClearStatusIntent",
-      "samples": [
-        "clear my status",
-        "empty my status"
-      ],
-      "slots": []
     }
   ],
   "types": [
@@ -49,7 +48,112 @@
       "values": [
         {
           "name": {
+            "value": "out for lunch"
+          }
+        },
+        {
+          "name": {
+            "value": "at lunch"
+          }
+        },
+        {
+          "name": {
+            "value": "getting lunch"
+          }
+        },
+        {
+          "name": {
+            "value": "having lunch"
+          }
+        },
+        {
+          "name": {
             "value": "lunch"
+          }
+        },
+        {
+          "name": {
+            "value": "out for coffee"
+          }
+        },
+        {
+          "name": {
+            "value": "getting coffee"
+          }
+        },
+        {
+          "name": {
+            "value": "busy"
+          }
+        },
+        {
+          "name": {
+            "value": "unavailable"
+          }
+        },
+        {
+          "name": {
+            "value": "head down"
+          }
+        },
+        {
+          "name": {
+            "value": "running errands"
+          }
+        },
+        {
+          "name": {
+            "value": "running an errand"
+          }
+        },
+        {
+          "name": {
+            "value": "at the doctor"
+          }
+        },
+        {
+          "name": {
+            "value": "at a doctor's appointment"
+          }
+        },
+        {
+          "name": {
+            "value": "sick"
+          }
+        },
+        {
+          "name": {
+            "value": "out sick"
+          }
+        },
+        {
+          "name": {
+            "value": "away"
+          }
+        },
+        {
+          "name": {
+            "value": "away from keyboard"
+          }
+        },
+        {
+          "name": {
+            "value": "a.f.k."
+          }
+        },
+        {
+          "name": {
+            "value": "on a call"
+          }
+        },
+        {
+          "name": {
+            "value": "in a call"
+          }
+        },
+        {
+          "name": {
+            "value": "call"
           }
         },
         {
@@ -64,37 +168,47 @@
         },
         {
           "name": {
-            "value": "errand"
-          }
-        },
-        {
-          "name": {
-            "value": "busy"
-          }
-        },
-        {
-          "name": {
-            "value": "away"
-          }
-        },
-        {
-          "name": {
-            "value": "call"
-          }
-        },
-        {
-          "name": {
-            "value": "sick"
-          }
-        },
-        {
-          "name": {
             "value": "meeting"
           }
         },
         {
           "name": {
+            "value": "in a meeting"
+          }
+        },
+        {
+          "name": {
             "value": "commuting"
+          }
+        },
+        {
+          "name": {
+            "value": "commuting in"
+          }
+        },
+        {
+          "name": {
+            "value": "out of office"
+          }
+        },
+        {
+          "name": {
+            "value": "o.o.o."
+          }
+        },
+        {
+          "name": {
+            "value": "on vacation"
+          }
+        },
+        {
+          "name": {
+            "value": "vacation"
+          }
+        },
+        {
+          "name": {
+            "value": "p.t.o."
           }
         }
       ]

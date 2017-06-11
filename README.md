@@ -4,7 +4,7 @@ Alexa skill to set status and manage notifications in Slack, built in Node and h
 
 ## Supported commands
 
-* "Alexa, tell Slack I'm `status` until `time`", sets the status message to the spoken status _and_ mutes Slack notifications until the spoken time (e.g. 3:15 pm, this afternoon, etc.) Super useful for meetings! For example, "tell Slack I'm in a call until 5:00 pm". Currently only allows a few commonly used, predefined statuses, which are: `lunch`, `coffee`, `busy`, `errand`, `doctor`, `away`, `call`, `meeting`, `sick`, and `commuting`. Setting it to an arbitrary status is not supported at the moment.
+* "Alexa, tell Slack I'm `status` until `time`", sets the status message to the spoken status _and_ mutes Slack notifications until the spoken time (e.g. 3:15 pm, this afternoon, etc.) Super useful for meetings! For example, "tell Slack I'm in a call until 5:00 pm".
 * "Alexa, tell Slack to clear my status", clears your status and un-mutes notifications.
 
 ## Installation

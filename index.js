@@ -19,54 +19,6 @@ const handlers = {
   'Unhandled': unhandledIntentHandler,
 };
 
-const statuses = {
-  lunch: {
-    status_text: 'Out for lunch',
-    status_emoji: ':taco:'
-  },
-  launch: {
-    // Fuck my accent.
-    status_text: 'Out for lunch',
-    status_emoji: ':taco:'
-  },
-  coffee: {
-    status_text: 'Out for coffee',
-    status_emoji: ':coffee:'
-  },
-  busy: {
-    status_text: 'Do not disturb',
-    status_emoji: ':no_entry_sign:'
-  },
-  errand: {
-    status_text: 'Running an errand',
-    status_emoji: ':running:'
-  },
-  doctor: {
-    status_text: 'Doctor\'s appointment',
-    status_emoji: ':face_with_thermometer:'
-  },
-  away: {
-    status_text: 'AFK',
-    status_emoji: ':no_entry_sign:'
-  },
-  call: {
-    status_text: 'On a call',
-    status_emoji: ':slack_call:'
-  },
-  meeting: {
-    status_text: 'In a meeting',
-    status_emoji: ':calendar:'
-  },
-  sick: {
-    status_text: 'Out sick',
-    status_emoji: ':face_with_thermometer:'
-  },
-  commuting: {
-    status_text: 'Commuting',
-    status_emoji: ':bus:'
-  }
-};
-
 /**
  * Handles launch requests, i.e. "Alexa, open [app name]".
  */
@@ -123,8 +75,6 @@ function statusIntentHandler() {
 
   if (!status) {
     this.emit(':ask', "I didn't get your status, please try again.", "I'm sorry, I didn't hear you. Could you say that again?");
-  } else if (!statuses[status]) {
-    this.emit(':ask', `I'm sorry, that's not a valid status. Your options are: ${Object.keys(statuses).join(', ')}. Please try again.`, "I'm sorry, I didn't hear you. Could you say that again?");
   }
 
   if (!requested_time) {
@@ -133,7 +83,7 @@ function statusIntentHandler() {
 
   getEchoUTCOffset(device_id, consent_token).
     then(offset => { return snoozeSlackUntil(requested_time, offset, access_token); }).
-    then(() => { return setSlackStatus(statuses[status], access_token); }).
+    then(() => { return setSlackStatus(emojifyStatus(status), access_token); }).
     then(() => { this.emit(':tell', `Okay, I'll change your status and snooze your notifications until ${moment(requested_time, 'HH:mm').format('h:mm a')}.`); }).
     catch(error => { this.emit(':tell', error.message); });
 }
@@ -397,4 +347,74 @@ function getUTCOffset(location) {
       return Promise.reject(new Error(`I'm sorry, I couldn't get the timezone for that location. The response from Google Maps was ${response.body.status}`));
     }
   });
+}
+
+/**
+ * Returns the profile object the Slack API requires.
+ * @param {String} status The user's requested status.
+ * @return {Object} An object with the text and emoji for the given status.
+ */
+function emojifyStatus(status) {
+  if (status.match(/la?unch/)) {
+    profile = {
+      status_text: 'Out for lunch',
+      status_emoji: ':taco:'
+    };
+  } else if (status.match(/coffee/)) {
+    profile = {
+      status_text: 'Out for coffee',
+      status_emoji: ':coffee:'
+    };
+  } else if (status.match(/busy|unavailable|head down/)) {
+    profile = {
+      status_text: 'Do not disturb',
+      status_emoji: ':no_entry_sign:'
+    };
+  } else if (status.match(/errand/)) {
+    profile = {
+      status_text: 'Running an errand',
+      status_emoji: ':running:'
+    };
+  } else if (status.match(/doctor/)) {
+    profile = {
+      status_text: 'Doctor\'s appointment',
+      status_emoji: ':face_with_thermometer:'
+    };
+  } else if (status.match(/away/)) {
+    profile = {
+      status_text: 'AFK',
+      status_emoji: ':zzz:'
+    };
+  } else if (status.match(/call/)) {
+    profile = {
+      status_text: 'On a call',
+      status_emoji: ':slack_call:'
+    };
+  } else if (status.match(/meeting/)) {
+    profile = {
+      status_text: 'In a meeting',
+      status_emoji: ':calendar:'
+    };
+  } else if (status.match(/sick/)) {
+    profile = {
+      status_text: 'Out sick',
+      status_emoji: ':face_with_thermometer:'
+    };
+  } else if (status.match(/commuting/)) {
+    profile = {
+      status_text: 'Commuting',
+      status_emoji: ':bus:'
+    };
+  } else if (status.match(/vacation/)) {
+    profile = {
+      status_text: 'On vacation',
+      status_emoji: ':palm_tree:'
+    };
+  } else {
+    profile = {
+      status_text: status,
+      status_emoji: ':mute:'
+    };
+  }
+  return profile;
 }
