@@ -5,12 +5,13 @@ Alexa skill to set status and manage notifications in Slack, built in Node and h
 ## Supported commands
 
 * "Alexa, tell Slack I'm `status` until `time`", sets the status message to the spoken status _and_ mutes Slack notifications until the spoken time (e.g. 3:15 pm, this afternoon, etc.) Super useful for meetings! For example, "tell Slack I'm in a call until 5:00 pm". Currently only allows a few commonly used, predefined statuses, which are: `lunch`, `coffee`, `busy`, `errand`, `doctor`, `away`, `call`, `meeting`, `sick`, and `commuting`. Setting it to an arbitrary status is not supported at the moment.
+* "Alexa, tell Slack to clear my status", clears your status and un-mutes notifications.
 
 ## Installation
 
 I can't release this on the Alexa Skills store because I don't have the right to use "Slack" as the invocation name for a public skill, but feel free to fork this repo and set it up as your own skill in development mode for private use. It'll take a bit of work, but you'll have to:
 
-* Set up a new [Slack app](https://api.slack.com/apps), with the `dnd:write`, and `users.profile:write` permission scopes.
+* Set up a new [Slack app](https://api.slack.com/apps), with the `dnd:read`, `dnd:write`, and `users.profile:write` permission scopes.
 * Set up an [Alexa Skills Kit skill](https://developer.amazon.com/edw/home.html#/skills). Use the code in `interaction_model.json` for the skill's interaction model.
 * Set up a project in the [Google Developer Console](https://console.developers.google.com). Enable the Google Maps Geocoding API and the Google Maps Time Zone API, and get an API key. (This is how we determine the user's time zone: get the postal code of the Echo, geocode it to a lat/long pair, then get the timezone offset of those coordinates. I wish Amazon made this easier.)
 * In the configuration tab, set up [account linking](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/linking-an-alexa-user-with-a-user-in-your-system) using your Slack app's OAuth information. (Pro tip: the "Client Authentication Scheme" option should be "Credentials in request body").

@@ -91,6 +91,12 @@ function slackClearStatusIntentHandler() {
   }
 
   setSlackStatus(status, access_token).
+    then(() => { return checkSlackSnooze(access_token); }).
+    then(snooze_active => {
+      if (snooze_active) {
+        return endSlackSnooze(access_token);
+      }
+    }).
     then(() => { this.emit(':tell', "Okay, I'll clear your status."); }).
     catch(error => { this.emit(':tell', error.message); });
 }
@@ -121,7 +127,7 @@ function slackBusyIntentHandler() {
   }
 
   getEchoUTCOffset(device_id, consent_token).
-    then(offset => { return setSlackDNDUntil(requested_time, offset, access_token); }).
+    then(offset => { return snoozeSlackUntil(requested_time, offset, access_token); }).
     then(() => { return setSlackStatus(statuses[status], access_token); }).
     then(() => { this.emit(':tell', `Okay, I'll change your status and snooze your notifications until ${moment(requested_time, 'HH:mm').format('h:mm a')}.`); }).
     catch(error => { this.emit(':tell', error.message); });
@@ -147,27 +153,27 @@ function unhandledIntentHandler() {
 }
 
 /**
- * Sets the Slack user's DND until a given time.
+ * Sets the Slack user's snooze until a given time.
  * @param {String} time The time snooze should end, e.g. 13:00 or EV
  * @param {Number} offset An UTC offset in minutes.
  * @param {String} token Slack auth token.
  * @return {Promise} A promise that resolves if the request is successful;
  * or is rejected with an error if it fails.
  */
-function setSlackDNDUntil(time, offset, token) {
+function snoozeSlackUntil(time, offset, token) {
   let requested_time = normalizeAmazonTime(time);
   let minutes = getMinutesUntil(requested_time, offset);
-  return setSlackDND(minutes, token);
+  return setSlackSnooze(minutes, token);
 }
 
 /**
- * Sets the Slack user's DND.
+ * Sets the Slack user's snooze.
  * @param {Number} minutes The number of minutes to snooze notifications.
  * @param {String} token Slack auth token.
  * @return {Promise} A promise that resolves if the request is successful;
  * or is rejected with an error if it fails.
  */
-function setSlackDND(minutes, token) {
+function setSlackSnooze(minutes, token) {
 
   let opts = {
     method: 'POST',
@@ -183,6 +189,58 @@ function setSlackDND(minutes, token) {
   return request(opts).then(response => {
     if (response.statusCode !== 200 || !response.body.ok) {
       return Promise.reject(new Error(`I couldn't snooze notifications. The error from Slack was: ${response.body.error}`));
+    }
+  });
+}
+
+/**
+ * Check if the Slack user's snooze is active.
+ * @param {String} token Slack auth token.
+ * @return {Promise} A promise that resolves if the request is successful;
+ * or is rejected with an error if it fails.
+ */
+function checkSlackSnooze(token) {
+
+  let opts = {
+    method: 'POST',
+    url: `https://slack.com/api/dnd.info`,
+    form: {
+      token: token
+    },
+    json: true,
+    simple: false,
+    resolveWithFullResponse: true
+  };
+  return request(opts).then(response => {
+    if (response.statusCode === 200 && response.body.ok) {
+      return response.body.snooze_enabled;
+    } else {
+      return Promise.reject(new Error(`I couldn't check snooze status. The error from Slack was: ${response.body.error}`));
+    }
+  });
+}
+
+/**
+ * Ends the Slack user's snooze.
+ * @param {String} token Slack auth token.
+ * @return {Promise} A promise that resolves if the request is successful;
+ * or is rejected with an error if it fails.
+ */
+function endSlackSnooze(token) {
+
+  let opts = {
+    method: 'POST',
+    url: `https://slack.com/api/dnd.endSnooze`,
+    form: {
+      token: token
+    },
+    json: true,
+    simple: false,
+    resolveWithFullResponse: true
+  };
+  return request(opts).then(response => {
+    if (response.statusCode !== 200 || !response.body.ok) {
+      return Promise.reject(new Error(`I couldn't end snooze. The error from Slack was: ${response.body.error}`));
     }
   });
 }
