@@ -85,7 +85,11 @@ function statusIntentHandler() {
 
   getEchoUTCOffset(device_id, consent_token).
     then(offset => { return snoozeSlackUntil(requested_time, offset, access_token); }).
-    then(() => { return setSlackStatus(emojifyStatus(status), access_token); }).
+    then(() => {
+      let slack_status = emojifyStatus(status);
+      slack_status.status_text += ` until ${moment(requested_time, 'HH:mm').format('h:mm a')}`;
+      return setSlackStatus(slack_status, access_token);
+    }).
     then(() => { this.emit(':tell', `Okay, I'll change your status and snooze your notifications until ${moment(requested_time, 'HH:mm').format('h:mm a')}.`); }).
     catch(error => { this.emit(':tell', error.message); });
 }
